@@ -6,10 +6,7 @@ The script creates a new folder and CSV file every 30 seconds to keep the data o
 To collect memory usage data, the script uses the ctypes library to call Windows API functions. The script runs until the user interrupts it with Ctrl+C.
 
 ## Imports and Constants
-  - ctypes: A foreign function library for Python, allowing calling functions in DLLs or shared libraries.
-  - time: Provides various time-related functions.
-  - csv: To handle CSV file reading and writing.
-  - os: Provides a way to use operating system-dependent functionality like reading or writing to the file system.
+These modules collectively enable the script to monitor system processes and save collected data efficiently.
 ```python
 import ctypes
 import ctypes.wintypes
@@ -18,6 +15,10 @@ import csv
 import os
 import subprocess
 ```
+  - ctypes: A foreign function library for Python, allowing calling functions in DLLs or shared libraries.
+  - time: Provides various time-related functions.
+  - csv: To handle CSV file reading and writing.
+  - os: Provides a way to use operating system-dependent functionality like reading or writing to the file system.
 ## Constants and Type Definitions
 These constants are used to define the access permissions for reading process memory and querying process information.
 ```python
