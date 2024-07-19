@@ -112,3 +112,49 @@ class PROCESS_MEMORY_COUNTERS_EX(ctypes.Structure):
   - PagefileUsage: The Commit Charge value in bytes for this process.
   - PeakPagefileUsage: The peak value in bytes of the Commit Charge during the lifetime of this process.
   - PrivateUsage: The amount of memory that the process has allocated that cannot be shared with other processes, in
+## Function to Get Process Memory Usage
+The function uses the kernel32 library to get system information and returns the number of processors on the system.
+```python
+def get_system_info():
+    kernel32 = ctypes.windll.kernel32
+    sys_info = SYSTEM_INFO()
+    kernel32.GetSystemInfo(ctypes.byref(sys_info))
+    return sys_info.dwNumberOfProcessors
+```
+  - Accesses the kernel32.dll to utilize Windows system function.
+  - Creates a SYSTEM_INFO structure to store system details.
+  - Calls the GetSystemInfo function, and fills sys_info with system information.
+  - Returns the number of logical processors from the sys_info structure.
+## Function to Get Running Applications
+The get_app_cpu_usage_windows function uses the tasklist command to find a specific application and retrieve its CPU usage. It processes the command output to extract the CPU usage percentage and returns it as a float. If the application is not found or an error occurs, the function returns
+None
+.
+```python
+def get_app_cpu_usage_windows(app_name):
+    try:
+        process = subprocess.Popen(['tasklist', '/FI', 'IMAGENAME eq {}'.format(app_name), '/FO', 'CSV'], stdout=subprocess.PIPE, shell=True)
+        stdout, stderr = process.communicate()
+
+        lines = stdout.decode().strip().split('\n')
+        if len(lines) > 1:  # Ensure that the process exists
+            cpu_usage_str = lines[1].split(',')[3].strip().replace('%', '').replace('"', '')
+            return float(cpu_usage_str)
+    except subprocess.CalledProcessError:
+        pass
+    return None
+```
+  - Execute Command
+    - Uses subprocess.Popen to execute the tasklist command with filters to get details of the specified application in CSV format.
+    - Captures the standard output (stdout) of the command.
+  Parse Output
+    - Decodes the stdout from bytes to a string and splits it into lines.
+    - Checks if the output contains more than one line to ensure the application exists.
+    - Extracts the CPU usage from the appropriate CSV field (4th column).
+    - Cleans the extracted string by removing '%' and any quotes.
+    - Converts the cleaned CPU usage string to a float.
+  - Return Value
+    - Returns the CPU usage as a float if the application is found.
+    - Returns None if the application is not found or an error occurs.
+  - Exception Handling
+    - Catches and ignores subprocess.CalledProcessError.
+    - Returns None if an exception occurs or if the application is not found.
